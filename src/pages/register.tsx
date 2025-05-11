@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import React, {useState} from "react";
+import {Formik, Form, Field, ErrorMessage, FormikHelpers} from "formik";
 import * as Yup from "yup";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
+import {useUploadApi} from "../hooks/useApi";
+import {register} from "../api/auth";
 
 interface RegisterFormValues {
   firstName: string;
@@ -31,13 +33,20 @@ const validationSchema = Yup.object({
 const Register: React.FC = () => {
   const router = useRouter();
 
+  const {isLoading, makeRequest} = useUploadApi();
+
   const handleSubmit = async (
     values: RegisterFormValues,
-    { resetForm }: FormikHelpers<RegisterFormValues>
+    {resetForm}: FormikHelpers<RegisterFormValues>
   ) => {
-      console.log("User Registered:", values);
-      resetForm();
+    makeRequest(() => register(values.firstName, values.lastName, values.email, values.password)).then((d) => {
+        console.log(d);
+    }).catch((error) => {
+      console.log(error);
+    });
     
+    console.log("User Registered:", values);
+    resetForm();
   };
 
   return (
@@ -140,9 +149,10 @@ const Register: React.FC = () => {
               Register
             </button>
 
-             <div className="text-center text-sm text-gray-600 mt-4">
+            <div className="text-center text-sm text-gray-600 mt-4">
               <p className="inline">Already have an account? </p>
               <button
+                disabled={isLoading}
                 type="button"
                 onClick={() => router.push("/login")}
                 className="text-blue-600 font-bold hover:underline cursor-pointer"

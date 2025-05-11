@@ -1,7 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Formik, Form, Field, ErrorMessage, FormikHelpers} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/router";
+import {useUploadApi} from "../hooks/useApi";
+import {login} from "../api/auth";
+import useAuth from "../hooks/useAuth";
 
 interface LoginFormValues {
   email: string;
@@ -25,13 +28,28 @@ const validationSchema = Yup.object({
 const Login: React.FC = () => {
   const router = useRouter();
 
+  const {isLoading, makeRequest} = useUploadApi();
+  const {login:lg, user, isLoading:il} = useAuth();
+  
   const handleSubmit = async (
     values: LoginFormValues,
     {resetForm}: FormikHelpers<LoginFormValues>
   ) => {
-    console.log(values);
+    makeRequest(() => login(values.email, values.password)).then((d) => {
+      lg(d)
+      router.push("/todos");
+    }).catch((error) => {
+      console.log(error);
+    });
     resetForm();
   };
+
+  useEffect(() => {
+    if(user && !isLoading){
+      router.push("/todos")
+    }
+  },[user, isLoading])
+
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 px-4">
@@ -96,6 +114,7 @@ const Login: React.FC = () => {
             <div className="text-center text-sm text-gray-600 mt-4">
               <p className="inline">Don’t have an account? </p>
               <button
+                disabled={isLoading}
                 type="button"
                 onClick={() => router.push("/register")}
                 className="text-blue-600 font-bold hover:underline cursor-pointer"
