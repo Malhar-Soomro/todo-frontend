@@ -5,11 +5,11 @@ const Header = () => {
   const {isLoggedIn, logout} = useAuth();
 
  return (
-    <div className="flex justify-between items-center sm:p-2 p-1 px-10 bg-gray-700 shadow-md">
+    <div className="flex justify-between items-center sm:p-3 px-0 bg-gray-700 shadow-md">
 
-      <div className="pl-4">
+      <div className="pl-2 md:pl-4">
         <Link href={isLoggedIn? "/todos":"/"}>
-          <h1 className="font-bold text-md sm:text-3xl mx-1">
+          <h1 className="font-bold text-md sm:text-3xl mx-1 text-white">
             MY TODOS
           </h1>
         </Link>
