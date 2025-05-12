@@ -90,6 +90,7 @@ const Todos: React.FC = () => {
       });
   };
 
+
   return (
     <Layout>
       <div className="min-h-screen flex flex-col items-center justify-start pt-20 px-4 bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364] text-white font-sans">
