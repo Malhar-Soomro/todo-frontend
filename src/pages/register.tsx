@@ -1,9 +1,11 @@
-import React, {useState} from "react";
+import React, {useEffect} from "react";
 import {Formik, Form, Field, ErrorMessage, FormikHelpers} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/router";
 import {useUploadApi} from "../hooks/useApi";
 import {register} from "../api/auth";
+import Swal from "sweetalert2";
+import useAuth from "@/hooks/useAuth";
 
 interface RegisterFormValues {
   firstName: string;
@@ -35,19 +37,40 @@ const Register: React.FC = () => {
 
   const {isLoading, makeRequest} = useUploadApi();
 
+  const {user} = useAuth();
+
   const handleSubmit = async (
     values: RegisterFormValues,
     {resetForm}: FormikHelpers<RegisterFormValues>
   ) => {
-    makeRequest(() => register(values.firstName, values.lastName, values.email, values.password)).then((d) => {
-        console.log(d);
-    }).catch((error) => {
-      console.log(error);
-    });
-    
-    console.log("User Registered:", values);
-    resetForm();
+    makeRequest(() =>
+      register(values.firstName, values.lastName, values.email, values.password)
+    )
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "User registered successfully",
+          timer: 1000,
+        });
+        resetForm();
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.message || "Something went wrong!",
+          timer: 1000,
+        });
+      });
   };
+
+  useEffect(() => {
+    // if user is logged in then redirect it to the todos page
+    if (user && !isLoading) {
+      router.push("/todos");
+    }
+  }, [user, isLoading]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 px-4">

@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {Formik, Form, Field, ErrorMessage, FormikHelpers} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/router";
 import {useUploadApi} from "../hooks/useApi";
 import {login} from "../api/auth";
 import useAuth from "../hooks/useAuth";
+import Swal from "sweetalert2";
 
 interface LoginFormValues {
   email: string;
@@ -29,27 +30,44 @@ const Login: React.FC = () => {
   const router = useRouter();
 
   const {isLoading, makeRequest} = useUploadApi();
-  const {login:lg, user, isLoading:il} = useAuth();
-  
+  const {loginUser, user} = useAuth();
+
   const handleSubmit = async (
     values: LoginFormValues,
     {resetForm}: FormikHelpers<LoginFormValues>
   ) => {
-    makeRequest(() => login(values.email, values.password)).then((d) => {
-      lg(d)
-      router.push("/todos");
-    }).catch((error) => {
-      console.log(error);
-    });
-    resetForm();
+    makeRequest(() => {
+      // hit the api
+      return login(values.email, values.password);
+    })
+      .then((data) => {
+        // this function only updates the state
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "User logged in successfully",
+          timer: 1000,
+        });
+        loginUser(data);
+        resetForm();
+        router.push("/todos");
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.message || "Something went wrong!",
+          timer:1000,
+        });
+      });
   };
 
   useEffect(() => {
-    if(user && !isLoading){
-      router.push("/todos")
+    // if user is logged in then redirect it to the todos page
+    if (user && !isLoading) {
+      router.push("/todos");
     }
-  },[user, isLoading])
-
+  }, [user, isLoading]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 px-4">
