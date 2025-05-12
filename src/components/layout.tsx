@@ -1,4 +1,3 @@
-import "@/styles/globals.css";
 import {PropsWithChildren, useEffect} from "react";
 import useAuth from "@/hooks/useAuth";
 import {useRouter} from "next/router";
