@@ -1,9 +1,8 @@
 import React from "react";
 import useAuth from "../hooks/useAuth";
 
-
 const Home = () => {
-  const {isLoggedIn, logout} = useAuth();
+  const {isLoggedIn} = useAuth();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-800 to-indigo-900 text-white px-4">
