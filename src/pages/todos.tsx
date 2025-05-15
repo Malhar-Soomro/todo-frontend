@@ -1,7 +1,7 @@
-import {addTodo, getTodos, deleteTodo as dl, updateTodo} from "@/api/todos";
+import { addTodo, getTodos, deleteTodo as dl, updateTodo } from "@/api/todos";
 import Layout from "@/components/layout";
-import {useGetApi, useUploadApi} from "@/hooks/useApi";
-import React, {useState} from "react";
+import { useGetApi, useUploadApi } from "@/hooks/useApi";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 
 interface Todo {
@@ -37,7 +37,7 @@ const Todos: React.FC = () => {
         getApi.makeRequest();
       })
       .catch(() => {
-          Swal.fire({
+        Swal.fire({
           icon: "error",
           title: "Error",
           text: "Something went wrong",
@@ -48,18 +48,18 @@ const Todos: React.FC = () => {
 
   const toggleTodo = (id: string, completed: boolean) => {
     updateApi
-      .makeRequest(() => updateTodo(id, {completed}))
+      .makeRequest(() => updateTodo(id, { completed }))
       .then(() => {
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: `Todo ${completed? "marked":"unmarked"} successfully`,
+          text: `Todo ${completed ? "marked" : "unmarked"} successfully`,
           timer: 1000,
         });
         getApi.makeRequest();
       })
       .catch(() => {
-          Swal.fire({
+        Swal.fire({
           icon: "error",
           title: "Error",
           text: "Something went wrong",
@@ -72,7 +72,7 @@ const Todos: React.FC = () => {
     deleteApi
       .makeRequest(() => dl(id))
       .then(() => {
-         Swal.fire({
+        Swal.fire({
           icon: "success",
           title: "Success",
           text: "Todo deleted successfully",
@@ -89,7 +89,6 @@ const Todos: React.FC = () => {
         });
       });
   };
-
 
   return (
     <Layout>
@@ -113,9 +112,13 @@ const Todos: React.FC = () => {
           <button
             disabled={addApi.isLoading}
             onClick={handleAddTodo}
-            className="w-full bg-pink-600 text-white font-semibold py-3 rounded-lg hover:bg-pink-700 transition"
+            className={`w-full py-3 rounded-lg font-semibold transition 
+              ${addApi.isLoading
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60"
+                : "bg-pink-600 text-white hover:bg-pink-700 cursor-pointer"
+              }`}
           >
-            Add Task
+            {addApi.isLoading ? "Adding..." : "Add Task"}
           </button>
         </div>
 
@@ -131,6 +134,7 @@ const Todos: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <input
+                  disabled={updateApi.isLoading}
                   type="checkbox"
                   checked={todo.completed}
                   onChange={(e) => toggleTodo(todo._id, e.target.checked)}

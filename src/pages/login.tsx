@@ -1,11 +1,9 @@
-import React, {useEffect} from "react";
+import React, {useContext, useEffect} from "react";
 import {Formik, Form, Field, ErrorMessage, FormikHelpers} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/router";
-import {useUploadApi} from "../hooks/useApi";
-import {login} from "../api/auth";
-import useAuth from "../hooks/useAuth";
 import Swal from "sweetalert2";
+import { AuthContext } from "@/context/authContext";
 
 interface LoginFormValues {
   email: string;
@@ -29,45 +27,72 @@ const validationSchema = Yup.object({
 const Login: React.FC = () => {
   const router = useRouter();
 
-  const {isLoading, makeRequest} = useUploadApi();
-  const {loginUser, user} = useAuth();
+  // const {isLoading, makeRequest} = useUploadApi();
+  // const {loginUser, user} = useAuth();
+
+  const {login, auth} = useContext(AuthContext); 
+
+
+  console.log(auth)
 
   const handleSubmit = async (
     values: LoginFormValues,
     {resetForm}: FormikHelpers<LoginFormValues>
   ) => {
-    makeRequest(() => {
-      // hit the api
-      return login(values.email, values.password);
-    })
-      .then((data) => {
-        // this function only updates the state
+
+    login(values.email, values.password).then(() => {
         Swal.fire({
           icon: "success",
           title: "Success",
           text: "User logged in successfully",
           timer: 1000,
         });
-        loginUser(data);
         resetForm();
         router.push("/todos");
       })
       .catch((error) => {
+        console.log(error)
         Swal.fire({
           icon: "error",
           title: "Error",
           text: error.response?.data?.message || "Something went wrong!",
-          timer:1000,
+          timer: 1000,
         });
-      });
+  });
+    // makeRequest(() => {
+    //   // hit the api
+    //   return login(values.email, values.password);
+    // })
+    //   .then((data) => {
+    //     // this function only updates the state
+    //     Swal.fire({
+    //       icon: "success",
+    //       title: "Success",
+    //       text: "User logged in successfully",
+    //       timer: 1000,
+    //     });
+    //     loginUser(data);
+    //     resetForm();
+    //     router.push("/todos");
+    //   })
+    //   .catch((error) => {
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Error",
+    //       text: error.response?.data?.message || "Something went wrong!",
+    //       timer: 1000,
+    //     });
+    //   });
   };
 
   useEffect(() => {
     // if user is logged in then redirect it to the todos page
-    if (user && !isLoading) {
+    if ( auth.user && !auth.isLoading) {
+      console.log("auth.user: ", auth.user)
+      console.log("auth.isLoading: ", auth.isLoading)
       router.push("/todos");
     }
-  }, [user, isLoading]);
+  }, [auth.user, auth.isLoading]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 px-4">
@@ -123,16 +148,20 @@ const Login: React.FC = () => {
             </div>
 
             <button
+              disabled={auth.isLoading}
               type="submit"
-              className="w-full p-3 rounded-lg text-white font-semibold transition duration-300 bg-pink-600 hover:bg-pink-700 cursor-pointer"
+              className={`w-full p-3 rounded-lg font-semibold transition duration-300 
+                ${
+                  auth.isLoading
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60"
+                    : "bg-pink-600 text-white hover:bg-pink-700 cursor-pointer"
+                }`}
             >
-              Login
+              {auth.isLoading ? "Loading..." : "login"}
             </button>
-
             <div className="text-center text-sm text-gray-600 mt-4">
               <p className="inline">Don’t have an account? </p>
               <button
-                disabled={isLoading}
                 type="button"
                 onClick={() => router.push("/register")}
                 className="text-blue-600 font-bold hover:underline cursor-pointer"

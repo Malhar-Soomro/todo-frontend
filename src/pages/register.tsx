@@ -1,11 +1,12 @@
-import React, {useEffect} from "react";
+import React, {useContext, useEffect} from "react";
 import {Formik, Form, Field, ErrorMessage, FormikHelpers} from "formik";
 import * as Yup from "yup";
 import {useRouter} from "next/router";
 import {useUploadApi} from "../hooks/useApi";
 import {register} from "../api/auth";
 import Swal from "sweetalert2";
-import useAuth from "@/hooks/useAuth";
+import { AuthContext } from "@/context/authContext";
+// import useAuth from "@/hooks/useAuth";
 
 interface RegisterFormValues {
   firstName: string;
@@ -36,8 +37,10 @@ const Register: React.FC = () => {
   const router = useRouter();
 
   const {isLoading, makeRequest} = useUploadApi();
+  console.log(isLoading);
 
-  const {user} = useAuth();
+  // const {user} = useAuth();
+  const {auth} = useContext(AuthContext);
 
   const handleSubmit = async (
     values: RegisterFormValues,
@@ -67,10 +70,10 @@ const Register: React.FC = () => {
 
   useEffect(() => {
     // if user is logged in then redirect it to the todos page
-    if (user && !isLoading) {
+    if (auth.user && !auth.isLoading) {
       router.push("/todos");
     }
-  }, [user, isLoading]);
+  }, [auth.user, auth.isLoading]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 px-4">
@@ -166,16 +169,21 @@ const Register: React.FC = () => {
             </div>
 
             <button
+              disabled={auth.isLoading}
               type="submit"
-              className="w-full p-3 rounded-lg text-white font-semibold transition duration-300 bg-pink-600 hover:bg-pink-700 "
+              className={`w-full p-3 rounded-lg font-semibold transition duration-300 
+                ${
+                  auth.isLoading
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60"
+                    : "bg-pink-600 text-white hover:bg-pink-700 cursor-pointer"
+                }`}
             >
-              Register
+              {auth.isLoading ? "Loading..." : "Register"}
             </button>
 
             <div className="text-center text-sm text-gray-600 mt-4">
               <p className="inline">Already have an account? </p>
               <button
-                disabled={isLoading}
                 type="button"
                 onClick={() => router.push("/login")}
                 className="text-blue-600 font-bold hover:underline cursor-pointer"
