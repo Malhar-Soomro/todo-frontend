@@ -166,8 +166,14 @@ const Register: React.FC = () => {
             </div>
 
             <button
+              disabled={isLoading}
               type="submit"
-              className="w-full p-3 rounded-lg text-white font-semibold transition duration-300 bg-pink-600 hover:bg-pink-700 "
+              className={`w-full p-3 rounded-lg font-semibold transition duration-300 
+                ${
+                  isLoading
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60"
+                    : "bg-pink-600 text-white hover:bg-pink-700 cursor-pointer"
+                }`}
             >
               Register
             </button>
@@ -175,7 +181,6 @@ const Register: React.FC = () => {
             <div className="text-center text-sm text-gray-600 mt-4">
               <p className="inline">Already have an account? </p>
               <button
-                disabled={isLoading}
                 type="button"
                 onClick={() => router.push("/login")}
                 className="text-blue-600 font-bold hover:underline cursor-pointer"

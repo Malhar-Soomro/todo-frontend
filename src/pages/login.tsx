@@ -57,7 +57,7 @@ const Login: React.FC = () => {
           icon: "error",
           title: "Error",
           text: error.response?.data?.message || "Something went wrong!",
-          timer:1000,
+          timer: 1000,
         });
       });
   };
@@ -123,8 +123,14 @@ const Login: React.FC = () => {
             </div>
 
             <button
+              disabled={isLoading}
               type="submit"
-              className="w-full p-3 rounded-lg text-white font-semibold transition duration-300 bg-pink-600 hover:bg-pink-700 cursor-pointer"
+              className={`w-full p-3 rounded-lg font-semibold transition duration-300 
+                ${
+                  isLoading
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60"
+                    : "bg-pink-600 text-white hover:bg-pink-700 cursor-pointer"
+                }`}
             >
               Login
             </button>
@@ -132,7 +138,6 @@ const Login: React.FC = () => {
             <div className="text-center text-sm text-gray-600 mt-4">
               <p className="inline">Don’t have an account? </p>
               <button
-                disabled={isLoading}
                 type="button"
                 onClick={() => router.push("/register")}
                 className="text-blue-600 font-bold hover:underline cursor-pointer"

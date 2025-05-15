@@ -106,14 +106,18 @@ const Todos: React.FC = () => {
           />
           <textarea
             placeholder="Description"
-            className="w-full p-3 rounded-lg border border-gray-300"
+            className="w-full p-3 rounded-lg border border-gray-300 h-full"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
           <button
             disabled={addApi.isLoading}
             onClick={handleAddTodo}
-            className="w-full bg-pink-600 text-white font-semibold py-3 rounded-lg hover:bg-pink-700 transition"
+            className={`w-full py-3 rounded-lg font-semibold transition 
+              ${addApi.isLoading
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60"
+                : "bg-pink-600 text-white hover:bg-pink-700 cursor-pointer"
+              }`}
           >
             Add Task
           </button>
@@ -131,6 +135,7 @@ const Todos: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <input
+                  disabled={updateApi.isLoading}
                   type="checkbox"
                   checked={todo.completed}
                   onChange={(e) => toggleTodo(todo._id, e.target.checked)}
@@ -140,7 +145,7 @@ const Todos: React.FC = () => {
                 <button
                   disabled={deleteApi.isLoading}
                   onClick={() => deleteTodo(todo._id)}
-                  className="text-red-400 hover:text-red-600"
+                  className={`${deleteApi.isLoading ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60": "text-red-400 hover:text-red-600"}`}
                 >
                   Delete
                 </button>
