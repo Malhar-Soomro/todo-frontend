@@ -1,8 +1,6 @@
-// useAuth.ts
 import {getUser} from "@/api/auth";
 import {useAtom, atom} from "jotai";
 import {useEffect} from "react";
-import Swal from "sweetalert2";
 
 export interface AuthState {
   isLoggedIn: boolean;
